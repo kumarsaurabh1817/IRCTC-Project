@@ -1,0 +1,70 @@
+# Repository metadata and local editor files
+.git
+**/.git
+**/.idea
+**/.vscode
+**/.DS_Store
+**/Thumbs.db
+**/Desktop.ini
+
+# Install dependencies inside the image; retain package.json and lockfiles
+**/node_modules
+**/.npm
+**/.pnpm-store
+**/.yarn/cache
+**/.yarn/unplugged
+
+# Local environment files and credentials
+**/.env
+**/.env.*
+**/*.env
+!**/.env.example
+!**/.env.*.example
+!**/*.env.example
+**/secrets
+**/credentials
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+
+# Host build output and generated clients; regenerate during image build
+**/dist
+**/build
+**/out
+**/src/generated/prisma
+**/*.tsbuildinfo
+
+# Runtime output, test output, caches, and temporary files
+**/logs
+**/log
+**/*.log
+**/*.log.*
+**/coverage
+**/.nyc_output
+**/.vite
+**/.cache
+**/.eslintcache
+**/.turbo
+**/tmp
+**/temp
+**/*.tmp
+**/*.swp
+**/*.swo
+**/*~
+
+# Local databases and Compose overrides
+**/*.sqlite
+**/*.sqlite3
+**/*.db
+**/*.db-journal
+**/*.dump
+**/*.backup
+**/compose.override.yml
+**/compose.override.yaml
+**/docker-compose.override.yml
+**/docker-compose.override.yaml
+docker-data
+
+# Keep shared/, frontend/public/, Prisma schemas/migrations,
+# package manifests, lockfiles, and Docker build configuration available.
