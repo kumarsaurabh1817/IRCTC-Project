@@ -1,42 +1,38 @@
-const asyncHandler = require("../utils/asyncHandler");
-const { BadRequestError, NotFoundError } = require("../utils/error");
-const userService = require('../services/user.service');
-const logger = require("../config/logger");
+import { asyncHandler } from '../utils/asyncHandler.js';
+import { BadRequestError, NotFoundError } from '../utils/error.js';
+import userService from '../services/user.service.js';
+import { logger } from '../config/logger.js';
 
-
-exports.getProfile = asyncHandler(async(req, res) =>{
+export const getProfile = asyncHandler(async (req, res) => {
      const userId = req.user.id;
-     if(!userId){
-          throw new BadRequestError("User Id is missing");
+     if (!userId) {
+          throw new BadRequestError('User Id is missing');
      }
 
      const user = await userService.getProfile(userId);
      return res.status(200).json({
           success: true,
-          message: "Fetched user details",
+          message: 'Fetched user details',
           data: {
-               user
-          }
-     })
-})
+               user,
+          },
+     });
+});
 
-exports.updateProfile = asyncHandler(async(req, res) =>{
+export const updateProfile = asyncHandler(async (req, res) => {
      // TODO TASK FOR YOU
-})
+});
 
-exports.deleteProfile = asyncHandler(async(req, res) =>{
+export const deleteProfile = asyncHandler(async (req, res) => {
      // TODO TASK FOR YOU
-})
+});
 
-exports.getUserInternal = asyncHandler(async(req, res) =>{
+export const getUserInternal = asyncHandler(async (req, res) => {
      const { userId } = req.params;
-     if(!userId){
-          throw new BadRequestError("User Id is missing");
-     }
 
      const user = await userService.getProfile(userId);
-     if(!user){
-          throw new NotFoundError("User not found");
+     if (!user) {
+          throw new NotFoundError('User not found');
      }
 
      return res.status(200).json({
@@ -46,6 +42,13 @@ exports.getUserInternal = asyncHandler(async(req, res) =>{
                firstName: user.firstName,
                lastName: user.lastName,
                email: user.email,
-          }
+          },
      });
-})
+});
+
+export default {
+     getProfile,
+     updateProfile,
+     deleteProfile,
+     getUserInternal,
+};

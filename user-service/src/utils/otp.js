@@ -1,18 +1,19 @@
-const { TooManyRequestsError } = require("./error");
-const {config} = require('../config');
-const {redis} = require('../config/redis');
-const otpGenerator = require('otp-generator');
-const crypto = require('crypto');
+import crypto from 'node:crypto';
+import otpGenerator from 'otp-generator';
+import { TooManyRequestsError } from './error.js';
+import { config } from '../config/index.js';
+import { redis } from '../config/redis.js';
 
 const RATE_MAX = parseInt(config.OTP_RATE_MAX_PER_HOUR || '5', 10);
 const ATTEMPT_MAX = parseInt(config.OTP_MAX_VERIFY_ATTEMPTS || '5', 10);
 const OTP_TTL = parseInt(config.OTP_TTL || '300', 10);
-const HMAC_SECRET = config.OTP_HMAC_SECRET
+const HMAC_SECRET = config.OTP_HMAC_SECRET;
 
 function hmacFor(email, otp){
      return crypto.createHmac('sha256', HMAC_SECRET).update(email + ":" + otp).digest('hex');
 }
-async function generateAndStoreOtp(meta){
+
+export async function generateAndStoreOtp(meta){
      // how many otp's you can send in an hour
      const rateKey = `otp:rate:${meta.email}`;
      const sentCount = parseInt(await redis.get(rateKey) || '0', 10);
@@ -20,14 +21,14 @@ async function generateAndStoreOtp(meta){
           throw new TooManyRequestsError(
                "Too many OTP requests. Try again later.",
                "OTP_RATE_LIMIT"
-          )
+          );
      }
 
      const otp = otpGenerator.generate(6, {
           upperCaseAlphabets: false,
           lowerCaseAlphabets: false,
           specialChars: false
-     })
+     });
 
      const otpSessionId = crypto.randomUUID();
      const hashed = hmacFor(meta.email, otp);
@@ -40,7 +41,7 @@ async function generateAndStoreOtp(meta){
      return {otp, otpSessionId};
 }
 
-async function verifyOtp(otp, otpSessionId){
+export async function verifyOtp(otp, otpSessionId){
      const rawData = await redis.get(`otp:session:${otpSessionId}`);
      if(!rawData) return null;
 
@@ -64,4 +65,4 @@ async function verifyOtp(otp, otpSessionId){
      }
 }
 
-module.exports = {generateAndStoreOtp, verifyOtp};
+export default { generateAndStoreOtp, verifyOtp };

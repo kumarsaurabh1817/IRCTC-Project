@@ -1,14 +1,14 @@
-const jwt = require('jsonwebtoken');
-const { config } = require('../config');
-const { UnauthorizedError } = require('../utils/error');
-const logger = require('../config/logger');
+import jwt from 'jsonwebtoken';
+import { config } from '../config/index.js';
+import { UnauthorizedError } from '../utils/error.js';
+import logger from '../config/logger.js';
 
 /**
  * Middleware to verify access token from Authorization header
  * This is going to be our authentication mechanism which will authenticate user
  * Extracts user ID and attaches it to request headers for downstream services
  */
-function requireAuth(req, res, next) {
+export function requireAuth(req, res, next) {
      try {
           let accessToken;
 
@@ -56,4 +56,4 @@ function requireAuth(req, res, next) {
      }
 }
 
-module.exports = { requireAuth };
+export default { requireAuth };

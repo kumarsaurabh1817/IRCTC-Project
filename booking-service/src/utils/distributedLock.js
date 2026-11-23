@@ -1,5 +1,5 @@
-const { redis } = require('../config/redis');
-const logger = require('../config/logger');
+import { redis } from '../config/redis.js';
+import logger from '../config/logger.js';
 
 /**
  * Redis distributed locking using Lua scripts for atomicity.
@@ -76,7 +76,7 @@ function buildLockKeys(scheduleId, seatIds, fromSeq, toSeq) {
  * @param {number} [toSeq] - Segment end (for segment-aware keys)
  * @returns {Promise<{acquired: boolean, lockValue: string|null}>}
  */
-async function acquireSeatLocks(scheduleId, seatIds, bookingId, ttlSeconds, fromSeq, toSeq) {
+export async function acquireSeatLocks(scheduleId, seatIds, bookingId, ttlSeconds, fromSeq, toSeq) {
      const keys = buildLockKeys(scheduleId, seatIds, fromSeq, toSeq);
      const lockValue = `${bookingId}:${Date.now()}`;
 
@@ -119,7 +119,7 @@ async function acquireSeatLocks(scheduleId, seatIds, bookingId, ttlSeconds, from
  * @param {number} [fromSeq] - Segment start (for segment-aware keys)
  * @param {number} [toSeq] - Segment end (for segment-aware keys)
  */
-async function releaseSeatLocks(scheduleId, seatIds, lockValue, fromSeq, toSeq) {
+export async function releaseSeatLocks(scheduleId, seatIds, lockValue, fromSeq, toSeq) {
      if (!lockValue) return;
 
      const keys = buildLockKeys(scheduleId, seatIds, fromSeq, toSeq);
@@ -144,7 +144,7 @@ async function releaseSeatLocks(scheduleId, seatIds, lockValue, fromSeq, toSeq) 
  * @param {number} [fromSeq] - Segment start (for segment-aware keys)
  * @param {number} [toSeq] - Segment end (for segment-aware keys)
  */
-async function forceReleaseSeatLocks(scheduleId, seatIds, fromSeq, toSeq) {
+export async function forceReleaseSeatLocks(scheduleId, seatIds, fromSeq, toSeq) {
      const keys = buildLockKeys(scheduleId, seatIds, fromSeq, toSeq);
 
      try {
@@ -157,7 +157,7 @@ async function forceReleaseSeatLocks(scheduleId, seatIds, fromSeq, toSeq) {
      }
 }
 
-module.exports = {
+export default {
      acquireSeatLocks,
      releaseSeatLocks,
      forceReleaseSeatLocks,

@@ -1,7 +1,7 @@
-const prisma = require('../config/prisma');
-const logger = require('../config/logger');
-const { inventoryClient } = require('./inventoryClient');
-const { paymentClient } = require('./paymentClient');
+import prisma from '../config/prisma.js';
+import logger from '../config/logger.js';
+import { inventoryClient } from './inventoryClient.js';
+import { paymentClient } from './paymentClient.js';
 
 /**
  * Saga orchestrator for booking lifecycle.
@@ -14,7 +14,7 @@ const { paymentClient } = require('./paymentClient');
 // ─── Forward Steps ───────────────────────────────────────────────────────────
 
 // --- SEGMENT BOOKING: Added fromSeq/toSeq params ---
-async function executeHoldSeats(booking, seatIds, ttlSeconds, fromSeq, toSeq) {
+export async function executeHoldSeats(booking, seatIds, ttlSeconds, fromSeq, toSeq) {
      const sagaLog = await prisma.sagaLog.create({
           data: {
                bookingId: booking.id,
@@ -58,7 +58,7 @@ async function executeHoldSeats(booking, seatIds, ttlSeconds, fromSeq, toSeq) {
      }
 }
 
-async function executeCreatePayment(booking) {
+export async function executeCreatePayment(booking) {
      const idempotencyKey = `${booking.id}-payment`;
 
      const sagaLog = await prisma.sagaLog.create({
@@ -105,7 +105,7 @@ async function executeCreatePayment(booking) {
 }
 
 // --- SEGMENT BOOKING: Added fromSeq/toSeq params ---
-async function executeConfirmSeats(booking, seatIds, fromSeq, toSeq) {
+export async function executeConfirmSeats(booking, seatIds, fromSeq, toSeq) {
      const sagaLog = await prisma.sagaLog.create({
           data: {
                bookingId: booking.id,
@@ -145,7 +145,7 @@ async function executeConfirmSeats(booking, seatIds, fromSeq, toSeq) {
 
 // ─── Compensation Steps ──────────────────────────────────────────────────────
 
-async function compensateHoldSeats(booking, seatIds) {
+export async function compensateHoldSeats(booking, seatIds) {
      logger.info(`Compensating HOLD_SEATS for booking ${booking.id}`);
      try {
           // --- SEGMENT BOOKING: Pass segment params from booking for accurate compensation ---
@@ -164,7 +164,7 @@ async function compensateHoldSeats(booking, seatIds) {
      }
 }
 
-async function compensateCreatePayment(booking) {
+export async function compensateCreatePayment(booking) {
      if (!booking.paymentOrderId) return;
 
      logger.info(`Compensating CREATE_PAYMENT for booking ${booking.id}`);
@@ -188,7 +188,7 @@ async function compensateCreatePayment(booking) {
      }
 }
 
-async function compensateConfirmSeats(booking) {
+export async function compensateConfirmSeats(booking) {
      logger.info(`Compensating CONFIRM_SEATS for booking ${booking.id}`);
      try {
           await inventoryClient.cancelBooking(booking.scheduleId, booking.id, booking.userId);
@@ -208,7 +208,7 @@ async function compensateConfirmSeats(booking) {
  * Compensate all completed saga steps in reverse order.
  * Used when a booking needs to be rolled back (failure, timeout, cancellation).
  */
-async function compensateAll(booking, seatIds) {
+export async function compensateAll(booking, seatIds) {
      const completedSteps = await prisma.sagaLog.findMany({
           where: { bookingId: booking.id, status: 'COMPLETED' },
           orderBy: { createdAt: 'desc' },
@@ -229,7 +229,7 @@ async function compensateAll(booking, seatIds) {
      }
 }
 
-module.exports = {
+export default {
      executeHoldSeats,
      executeCreatePayment,
      executeConfirmSeats,

@@ -1,29 +1,29 @@
-const { Kafka, logLevel } = require('kafkajs');
-const logger = require('./logger');
-const { config } = require('.');
+import { Kafka, logLevel } from 'kafkajs';
+import logger from './logger.js';
+import { config } from './index.js';
 
-const kafka = new Kafka({
+export const kafka = new Kafka({
      clientId: config.KAFKA_CLIENT_ID,
      brokers: [config.KAFKA_BROKER],
      logLevel: logLevel.ERROR,
      retry: { initialRetryTime: 300, retries: 8, maxRetryTime: 30000 },
 });
 
-const consumer = kafka.consumer({
+export const consumer = kafka.consumer({
      groupId: 'search-service-group-v2',
      sessionTimeout: 30000,
      heartbeatInterval: 3000,
 });
 
 // Producer (used only for DLQ publishing)
-const producer = kafka.producer({
+export const producer = kafka.producer({
      allowAutoTopicCreation: true,
      retry: { retries: 3 },
 });
 
 let isProducerConnected = false;
 
-const connectProducer = async () => {
+export const connectProducer = async () => {
      if (!isProducerConnected) {
           await producer.connect();
           isProducerConnected = true;
@@ -31,7 +31,7 @@ const connectProducer = async () => {
      }
 };
 
-const disconnectAll = async () => {
+export const disconnectAll = async () => {
      await consumer.disconnect();
      if (isProducerConnected) {
           await producer.disconnect();
@@ -40,4 +40,4 @@ const disconnectAll = async () => {
      logger.info('Kafka consumer disconnected');
 };
 
-module.exports = { kafka, consumer, producer, connectProducer, disconnectAll };
+export default { kafka, consumer, producer, connectProducer, disconnectAll };

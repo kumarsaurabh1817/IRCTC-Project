@@ -1,6 +1,6 @@
-const crypto = require("crypto");
+import crypto from 'node:crypto';
 
-function getDeviceFingerprint(req) {
+export function getDeviceFingerprint(req) {
      const userAgent = req.headers["user-agent"] || "";
      const ip = req.ip || "";
      const accept = req.headers["accept"] || "";
@@ -14,4 +14,4 @@ function getDeviceFingerprint(req) {
           .slice(0, 16); // short device id
 }
 
-module.exports = getDeviceFingerprint;
+export default getDeviceFingerprint;

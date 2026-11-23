@@ -10,7 +10,8 @@ services:
       POSTGRES_PASSWORD: irctcpass
       POSTGRES_DB: postgres
     ports:
-      - "5432:5432"
+      - "5432:5432" 
+      # local machine to container mapping
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:

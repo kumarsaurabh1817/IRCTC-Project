@@ -1,14 +1,13 @@
-const Redis = require('ioredis');
-const {config} = require('.');
-const logger = require('./logger');
+import Redis from 'ioredis';
+import { config } from './index.js';
+import logger from './logger.js';
 
-class RedisClient {
+export class RedisClient {
      static instance;
      static isConnected = false;
 
      constructor(){
           // prevent direct instantiation
-
      }
 
      static getInstance(){
@@ -19,7 +18,7 @@ class RedisClient {
                          return delay;
                     },
                     maxRetriesPerRequest: 3
-               })
+               });
 
                RedisClient.setupEventListeners();
           }
@@ -30,30 +29,30 @@ class RedisClient {
           RedisClient.instance.on('connect', () =>{
                RedisClient.isConnected = true;
                logger.info("Connected to Redis");
-          })
+          });
 
           RedisClient.instance.on('error', (error) =>{
                RedisClient.isConnected = false;
                logger.error("Redis connection error", error);
-          })
+          });
 
           RedisClient.instance.on('close', () =>{
                RedisClient.isConnected = false;
                logger.warn("Redis connection closed");
-          })
+          });
 
           RedisClient.instance.on('reconnecting', () =>{
                logger.warn("Reconnecting to Redis...");
-          })
+          });
 
           RedisClient.instance.on('ready', () =>{
                logger.warn("Redis client is ready");
-          })
+          });
 
           RedisClient.instance.on('end', () =>{
                RedisClient.isConnected = false;
                logger.warn("Redis connection ended");
-          })
+          });
      }
 
      static async closeConnection(){
@@ -83,8 +82,9 @@ class RedisClient {
 }
 
 // Export both the singleton instance and the class
+export const redis = RedisClient.getInstance();
 
-module.exports = {
-     redis: RedisClient.getInstance(),
+export default {
+     redis,
      RedisClient
-}
+};

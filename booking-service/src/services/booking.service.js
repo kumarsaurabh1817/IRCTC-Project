@@ -1,14 +1,14 @@
-const prisma = require('../config/prisma');
-const logger = require('../config/logger');
-const { config } = require('../config');
-const { inventoryClient, extractError: extractInventoryError } = require('./inventoryClient');
-const { paymentClient, extractError: extractPaymentError } = require('./paymentClient');
-const { userClient } = require('./userClient');
-const { stationClient } = require('./stationClient');
-const { acquireSeatLocks, releaseSeatLocks, forceReleaseSeatLocks } = require('../utils/distributedLock');
-const saga = require('./saga.service');
-const bookingProducer = require('../kafka/producer/booking.producer');
-const { BadRequestError, NotFoundError, ConflictError, StaleStateError } = require('../utils/error');
+import prisma from '../config/prisma.js';
+import logger from '../config/logger.js';
+import { config } from '../config/index.js';
+import { inventoryClient, extractError as extractInventoryError } from './inventoryClient.js';
+import { paymentClient, extractError as extractPaymentError } from './paymentClient.js';
+import { userClient } from './userClient.js';
+import { stationClient } from './stationClient.js';
+import { acquireSeatLocks, releaseSeatLocks, forceReleaseSeatLocks } from '../utils/distributedLock.js';
+import * as saga from './saga.service.js';
+import bookingProducer from '../kafka/producer/booking.producer.js';
+import { BadRequestError, NotFoundError, ConflictError, StaleStateError } from '../utils/error.js';
 
 // ─── Optimistic Lock Helper (CAS — Compare-And-Swap) ────────────────────────
 // Atomically updates booking status ONLY IF the version hasn't changed since read.
@@ -167,7 +167,7 @@ const releaseIdempotency = async (key) => {
 // ─── Create Booking ──────────────────────────────────────────────────────────
 
 // --- SEGMENT BOOKING: Added fromStationId, toStationId, fromSeq, toSeq params ---
-const createBooking = async (userId, scheduleId, seatIds, passengers, idempotencyKey, fromStationId, toStationId, fromSeq, toSeq) => {
+export const createBooking = async (userId, scheduleId, seatIds, passengers, idempotencyKey, fromStationId, toStationId, fromSeq, toSeq) => {
      // 1. Validate input
      if (!scheduleId || !seatIds || !Array.isArray(seatIds) || seatIds.length === 0) {
           throw new BadRequestError('scheduleId and seatIds (non-empty array) are required');
@@ -471,7 +471,7 @@ const refundOrphanedPayment = async (booking, gatewayPaymentId, amount) => {
 
 // ─── Handle Payment Success (Kafka consumer) ─────────────────────────────────
 
-const handlePaymentSuccess = async (paymentOrderId, gatewayPaymentId, amount) => {
+export const handlePaymentSuccess = async (paymentOrderId, gatewayPaymentId, amount) => {
      const booking = await prisma.booking.findUnique({
           where: { paymentOrderId },
           include: { seats: true, passengers: true },
@@ -617,7 +617,7 @@ const handlePaymentSuccess = async (paymentOrderId, gatewayPaymentId, amount) =>
 
 // ─── Handle Payment Failure (Kafka consumer) ─────────────────────────────────
 
-const handlePaymentFailure = async (paymentOrderId, reason) => {
+export const handlePaymentFailure = async (paymentOrderId, reason) => {
      const booking = await prisma.booking.findUnique({
           where: { paymentOrderId },
           include: { seats: true },
@@ -681,7 +681,7 @@ const handlePaymentFailure = async (paymentOrderId, reason) => {
 
 // ─── Cancel Booking ──────────────────────────────────────────────────────────
 
-const cancelBooking = async (bookingId, userId) => {
+export const cancelBooking = async (bookingId, userId) => {
      const booking = await prisma.booking.findUnique({
           where: { id: bookingId },
           include: { seats: true },
@@ -810,7 +810,7 @@ const cancelBooking = async (bookingId, userId) => {
 
 // ─── Get Booking ─────────────────────────────────────────────────────────────
 
-const getBooking = async (bookingId, userId) => {
+export const getBooking = async (bookingId, userId) => {
      const booking = await prisma.booking.findUnique({
           where: { id: bookingId },
           include: {
@@ -860,7 +860,7 @@ const getBooking = async (bookingId, userId) => {
 
 // ─── Get User Bookings ───────────────────────────────────────────────────────
 
-const getUserBookings = async (userId, { status, page = 1, limit = 10 } = {}) => {
+export const getUserBookings = async (userId, { status, page = 1, limit = 10 } = {}) => {
      const skip = (page - 1) * limit;
      const where = { userId };
      if (status) where.status = status.toUpperCase();
@@ -917,7 +917,7 @@ const getUserBookings = async (userId, { status, page = 1, limit = 10 } = {}) =>
 
 // ─── Verify Payment (client-side verification after Razorpay checkout) ───────
 
-const verifyPayment = async (bookingId, userId, razorpayPaymentId, razorpaySignature) => {
+export const verifyPayment = async (bookingId, userId, razorpayPaymentId, razorpaySignature) => {
      const booking = await prisma.booking.findUnique({
           where: { id: bookingId },
      });
@@ -967,7 +967,7 @@ const verifyPayment = async (bookingId, userId, razorpayPaymentId, razorpaySigna
 // When a schedule is cancelled, all active bookings on that schedule must be
 // failed/cancelled so users aren't left with stranded tickets.
 
-const handleScheduleCancelled = async (scheduleId) => {
+export const handleScheduleCancelled = async (scheduleId) => {
      if (!scheduleId) {
           logger.warn('handleScheduleCancelled called without scheduleId');
           return;
@@ -1252,7 +1252,7 @@ const recoverCancelling = async (booking, seatIds) => {
  * Safe to call repeatedly: every terminal write is status-guarded, so a booking
  * another process already finished is left alone.
  */
-const recoverStuckBooking = async (booking) => {
+export const recoverStuckBooking = async (booking) => {
      const seatIds = booking.seats.map(s => s.seatId).sort();
 
      logger.warn(`Recovering booking ${booking.id} stuck in ${booking.status}`, {
@@ -1263,7 +1263,7 @@ const recoverStuckBooking = async (booking) => {
      if (booking.status === 'CANCELLING') return recoverCancelling(booking, seatIds);
 };
 
-module.exports = {
+export default {
      createBooking,
      handlePaymentSuccess,
      handlePaymentFailure,

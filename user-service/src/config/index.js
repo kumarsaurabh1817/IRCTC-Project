@@ -1,5 +1,8 @@
-const config = {
-  SERVICE_NAME: require('../../package.json').name,
+import 'dotenv/config';
+import packageJson from '../../package.json' with { type: 'json' };
+
+export const config = {
+  SERVICE_NAME: packageJson.name,
   PORT: Number(process.env.PORT) || 4001,
   NODE_ENV: process.env.NODE_ENV || "development",
   LOG_LEVEL: process.env.LOG_LEVEL || "info",
@@ -22,7 +25,6 @@ const config = {
   REFRESH_TOKEN_EXP_SEC: Number(process.env.REFRESH_TOKEN_EXP_SEC || 604800),
   REDIS_USER_TTL: Number(process.env.REDIS_USER_TTL || 86400),
 
-
   MAIL_SEND: process.env.MAIL_SEND,
   SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
 
@@ -30,8 +32,7 @@ const config = {
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
 
   INTERNAL_SERVICE_KEY: process.env.INTERNAL_SERVICE_KEY,
-}
-
+};
 
 if (!config.GOOGLE_CLIENT_ID) {
   throw new Error("GOOGLE_CLIENT_ID environment variable is required");
@@ -44,4 +45,5 @@ if (!config.SENDGRID_API_KEY) {
 if (!config.MAIL_SEND) {
   throw new Error('MAIL_SEND missing');
 }
-module.exports = { config };
+
+export default config;

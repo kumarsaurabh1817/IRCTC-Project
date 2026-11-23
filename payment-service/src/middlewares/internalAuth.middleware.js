@@ -1,11 +1,11 @@
-const { config } = require('../config');
-const { ForbiddenError } = require('../utils/error');
+import { config } from '../config/index.js';
+import { ForbiddenError } from '../utils/error.js';
 
 /**
  * Validates that the request comes from an internal service
  * by checking the x-internal-service-key header.
  */
-const internalAuth = (req, res, next) => {
+export const internalAuth = (req, res, next) => {
      const serviceKey = req.headers['x-internal-service-key'];
 
      if (!serviceKey || serviceKey !== config.INTERNAL_SERVICE_KEY) {
@@ -15,4 +15,4 @@ const internalAuth = (req, res, next) => {
      next();
 };
 
-module.exports = { internalAuth };
+export default { internalAuth };

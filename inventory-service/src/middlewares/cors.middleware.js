@@ -1,11 +1,11 @@
-const cors = require('cors');
-const { config } = require('../config');
+import cors from 'cors';
+import { config } from '../config/index.js';
 
 const allowedOrigins = config.ALLOWED_ORIGINS
      ? config.ALLOWED_ORIGINS.split(',').map(o => o.trim())
      : [];
 
-const corsMiddleware = cors({
+export const corsMiddleware = cors({
      origin: function (origin, callback) {
 
           if (!origin) return callback(null, true);
@@ -21,4 +21,4 @@ const corsMiddleware = cors({
      allowedHeaders: ['Content-Type', 'Authorization'],
 });
 
-module.exports = { corsMiddleware };
+export default corsMiddleware;

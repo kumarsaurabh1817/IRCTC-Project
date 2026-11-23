@@ -1,32 +1,40 @@
-const crypto = require('crypto');
-const { config } = require('../config');
-const jwt = require('jsonwebtoken')
-const logger = require('../config/logger');
-const {UnauthorizedError} = require('./error');
+import crypto from 'node:crypto';
+import jwt from 'jsonwebtoken';
+import { config } from '../config/index.js';
+import { logger } from '../config/logger.js';
+import { UnauthorizedError } from './error.js';
 
-exports.hashToken = (refreshToken) => {
+export const hashToken = (refreshToken) => {
      return crypto.createHash('sha256').update(refreshToken).digest('hex');
-}
+};
 
-exports.generateAccessToken = (userId) => {
+export const generateAccessToken = (userId) => {
      const payload = {
           id: userId
-     }
-     return jwt.sign(payload, config.JWT_ACCESS_SECRET, { expiresIn: config.ACCESS_TOKEN_EXP })
-}
+     };
+     return jwt.sign(payload, config.JWT_ACCESS_SECRET, { expiresIn: config.ACCESS_TOKEN_EXP });
+};
 
-exports.generateRefreshToken = (userId) => {
+export const generateRefreshToken = (userId) => {
      const payload = {
           id: userId,
           jti: crypto.randomUUID()
-     }
-     return jwt.sign(payload, config.JWT_REFRESH_SECRET, { expiresIn: config.REFRESH_TOKEN_EXP })
-}
+     };
+     return jwt.sign(payload, config.JWT_REFRESH_SECRET, { expiresIn: config.REFRESH_TOKEN_EXP });
+};
 
-exports.verifyAccessToken = (accessToken) => {
+export const verifyAccessToken = (accessToken) => {
      return jwt.verify(accessToken, config.JWT_ACCESS_SECRET);
-}
+};
 
-exports.verifyRefreshToken = (refreshToken) => {
+export const verifyRefreshToken = (refreshToken) => {
      return jwt.verify(refreshToken, config.JWT_REFRESH_SECRET);
-}
+};
+
+export default {
+     hashToken,
+     generateAccessToken,
+     generateRefreshToken,
+     verifyAccessToken,
+     verifyRefreshToken
+};

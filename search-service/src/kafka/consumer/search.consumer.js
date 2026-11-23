@@ -1,10 +1,10 @@
-const { consumer, producer, connectProducer } = require('../../config/kafka');
-const searchService = require('../../services/search.service');
-const logger = require('../../config/logger');
-const { KAFKA_TOPICS } = require('../../../../shared/constants/kafka-topics');
-const { withDLQ } = require('../../../../shared/utils/dlqHandler');
+import { consumer, producer, connectProducer } from '../../config/kafka.js';
+import * as searchService from '../../services/search.service.js';
+import logger from '../../config/logger.js';
+import { KAFKA_TOPICS } from '../../../../shared/constants/kafka-topics.js';
+import { withDLQ } from '../../../../shared/utils/dlqHandler.js';
 
-class SearchConsumer {
+export class SearchConsumer {
      async start() {
           await consumer.connect();
           await connectProducer(); // needed for DLQ publishing
@@ -51,4 +51,6 @@ class SearchConsumer {
      }
 }
 
-module.exports = new SearchConsumer();
+export const searchConsumer = new SearchConsumer();
+
+export default searchConsumer;

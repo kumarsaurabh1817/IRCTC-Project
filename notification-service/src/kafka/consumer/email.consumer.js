@@ -1,10 +1,10 @@
-const { consumer, producer, connectProducer } = require('../../config/kafka');
-const emailService = require('../../services/email.service');
-const logger = require('../../config/logger');
-const { KAFKA_TOPICS } = require('../../../../shared/constants/kafka-topics');
-const { withDLQ } = require('../../../../shared/utils/dlqHandler');
+import { consumer, producer, connectProducer } from '../../config/kafka.js';
+import emailService from '../../services/email.service.js';
+import logger from '../../config/logger.js';
+import { KAFKA_TOPICS } from '../../../../shared/constants/kafka-topics.js';
+import { withDLQ } from '../../../../shared/utils/dlqHandler.js';
 
-class EmailConsumer {
+export class EmailConsumer {
      async start() {
           try {
                await consumer.connect();
@@ -121,4 +121,7 @@ class EmailConsumer {
      }
 }
 
-module.exports = new EmailConsumer();
+const emailConsumer = new EmailConsumer();
+
+export default emailConsumer;
+export { emailConsumer };

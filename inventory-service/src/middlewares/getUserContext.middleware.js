@@ -1,6 +1,6 @@
-const { UnauthorizedError } = require('../utils/error');
+import { UnauthorizedError } from '../utils/error.js';
 
-function getUserContext(req, res, next) {
+export function getUserContext(req, res, next) {
      const userId = req.headers['x-user-id'];
 
      if (!userId) {
@@ -13,4 +13,4 @@ function getUserContext(req, res, next) {
      next();
 }
 
-module.exports = { getUserContext };
+export default getUserContext;

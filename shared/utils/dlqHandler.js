@@ -6,11 +6,11 @@
  * and the consumer moves on instead of blocking forever.
  *
  * Usage (in any consumer):
- *   const { withDLQ } = require('../../../../shared/utils/dlqHandler');
+ *   import { withDLQ } from '../../../../shared/utils/dlqHandler.js';
  *   await consumer.run({ eachMessage: withDLQ(producer, dlqTopic, logger, handler) });
  */
 
-const { DLQ_MAX_RETRIES } = require('../constants/kafka-topics');
+import { DLQ_MAX_RETRIES } from '../constants/kafka-topics.js';
 
 /**
  * @param {import('kafkajs').Producer} producer  – Kafka producer (for sending to DLQ)
@@ -19,7 +19,7 @@ const { DLQ_MAX_RETRIES } = require('../constants/kafka-topics');
  * @param {Function} handler   – async ({ topic, partition, message, parsedValue }) => void
  * @returns {Function} eachMessage-compatible handler
  */
-function withDLQ(producer, dlqTopic, logger, handler) {
+export function withDLQ(producer, dlqTopic, logger, handler) {
      // In-memory retry tracker: key = `${topic}:${partition}:${offset}` → attempt count
      const retryMap = new Map();
 
@@ -98,4 +98,4 @@ async function sendToDLQ(producer, dlqTopic, originalTopic, partition, message, 
      }
 }
 
-module.exports = { withDLQ };
+export default withDLQ;

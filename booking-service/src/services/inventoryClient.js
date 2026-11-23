@@ -1,6 +1,6 @@
-const axios = require('axios');
-const { config } = require('../config');
-const logger = require('../config/logger');
+import axios from 'axios';
+import { config } from '../config/index.js';
+import logger from '../config/logger.js';
 
 const client = axios.create({
      baseURL: config.INVENTORY_SERVICE_URL,
@@ -40,7 +40,7 @@ async function withRetry(fn, maxRetries = 3) {
 /**
  * Extract error message from axios error.
  */
-function extractError(error) {
+export function extractError(error) {
      if (error.response?.data) {
           return {
                status: error.response.status,
@@ -51,7 +51,7 @@ function extractError(error) {
      return { status: 500, message: error.message, code: 'INVENTORY_SERVICE_ERROR' };
 }
 
-const inventoryClient = {
+export const inventoryClient = {
      async getAvailability(scheduleId) {
           return withRetry(async () => {
                const { data } = await client.get(`/schedules/${scheduleId}/availability`);
@@ -136,4 +136,4 @@ const inventoryClient = {
      },
 };
 
-module.exports = { inventoryClient, extractError };
+export default inventoryClient;

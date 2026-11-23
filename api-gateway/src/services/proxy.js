@@ -1,13 +1,13 @@
-const axios = require('axios');
-const { config } = require('../config');
-const { ServiceUnavailableError, GatewayTimeoutError } = require('../utils/error');
-const logger = require('../config/logger');
+import axios from 'axios';
+import { config } from '../config/index.js';
+import { ServiceUnavailableError, GatewayTimeoutError } from '../utils/error.js';
+import logger from '../config/logger.js';
 
 /**
  * Circuit Breaker implementation
  * Prevents cascading failures when downstream services are down
  */
-class CircuitBreaker {
+export class CircuitBreaker {
      constructor(serviceName, threshold = config.CIRCUIT_BREAKER_THRESHOLD, timeout = config.CIRCUIT_BREAKER_TIMEOUT) {
           this.serviceName = serviceName;
           this.failureCount = 0;
@@ -69,7 +69,7 @@ class CircuitBreaker {
 }
 
 // Circuit breakers for each service
-const circuitBreakers = {
+export const circuitBreakers = {
      userService: new CircuitBreaker('user-service'),
      searchService: new CircuitBreaker('search-service'),
      adminService: new CircuitBreaker('admin-service'),
@@ -172,7 +172,7 @@ async function forwardRequest(serviceUrl, path, method, data, headers, circuitBr
 /**
  * Proxy middleware factory
  */
-function createProxy(serviceName, serviceUrl) {
+export function createProxy(serviceName, serviceUrl) {
      const circuitBreaker = circuitBreakers[serviceName];
 
      if (!circuitBreaker) {
@@ -220,11 +220,11 @@ function createProxy(serviceName, serviceUrl) {
 /**
  * Health check endpoint for circuit breakers
  */
-function getCircuitBreakerStatus() {
+export function getCircuitBreakerStatus() {
      return Object.values(circuitBreakers).map((cb) => cb.getState());
 }
 
-module.exports = {
+export default {
      createProxy,
      CircuitBreaker,
      circuitBreakers,

@@ -1,8 +1,8 @@
-const Redis = require('ioredis');
-const { config } = require('.');
-const logger = require('./logger');
+import Redis from 'ioredis';
+import { config } from './index.js';
+import logger from './logger.js';
 
-class RedisClient {
+export class RedisClient {
      static instance;
      static isConnected = false;
 
@@ -82,8 +82,9 @@ class RedisClient {
 }
 
 // Export both the singleton instance and the class
+export const redis = RedisClient.getInstance();
 
-module.exports = {
-     redis: RedisClient.getInstance(),
+export default {
+     redis,
      RedisClient
-}
+};

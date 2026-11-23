@@ -1,8 +1,9 @@
-const asyncHandler = require('../utils/asyncHandler');
-const { BadRequestError } = require('../utils/error');
-const inventoryService = require('../services/inventory.service');
+import asyncHandler from '../utils/asyncHandler.js';
+import * as inventoryService from '../services/inventory.service.js';
 
-exports.getScheduleAvailability = asyncHandler(async (req, res) => {
+// Request shape is validated by zod (see validations/inventory.validation.js)
+
+export const getScheduleAvailability = asyncHandler(async (req, res) => {
      const { scheduleId } = req.params;
 
      const data = await inventoryService.getAvailability(scheduleId);
@@ -10,13 +11,13 @@ exports.getScheduleAvailability = asyncHandler(async (req, res) => {
      res.status(200).json({ success: true, data });
 });
 
-exports.getScheduleSeats = asyncHandler(async (req, res) => {
+export const getScheduleSeats = asyncHandler(async (req, res) => {
      const { scheduleId } = req.params;
      const { status, seatType, fromSeq, toSeq } = req.query; // --- SEGMENT BOOKING: added fromSeq/toSeq
 
      const filters = {};
-     if (status) filters.status = status.toUpperCase();
-     if (seatType) filters.seatType = seatType.toUpperCase();
+     if (status) filters.status = status;
+     if (seatType) filters.seatType = seatType;
      if (fromSeq) filters.fromSeq = fromSeq; // --- SEGMENT BOOKING
      if (toSeq) filters.toSeq = toSeq;       // --- SEGMENT BOOKING
 
@@ -25,16 +26,8 @@ exports.getScheduleSeats = asyncHandler(async (req, res) => {
      res.status(200).json({ success: true, data });
 });
 
-exports.lockSeats = asyncHandler(async (req, res) => {
+export const lockSeats = asyncHandler(async (req, res) => {
      const { scheduleId, seatIds, ttlSeconds, userId, fromSeq, toSeq, idempotencyKey } = req.body; // --- SEGMENT BOOKING: added fromSeq/toSeq
-
-     if (!scheduleId || !seatIds || !Array.isArray(seatIds) || seatIds.length === 0) {
-          throw new BadRequestError('scheduleId and seatIds (non-empty array) are required');
-     }
-
-     if (!userId) {
-          throw new BadRequestError('userId is required');
-     }
 
      const result = await inventoryService.lockSeats(scheduleId, seatIds, userId, ttlSeconds, fromSeq, toSeq, idempotencyKey); // --- SEGMENT BOOKING
 
@@ -49,16 +42,8 @@ exports.lockSeats = asyncHandler(async (req, res) => {
      });
 });
 
-exports.unlockSeats = asyncHandler(async (req, res) => {
+export const unlockSeats = asyncHandler(async (req, res) => {
      const { scheduleId, seatIds, userId, fromSeq, toSeq, idempotencyKey } = req.body; // --- SEGMENT BOOKING: added fromSeq/toSeq
-
-     if (!scheduleId || !seatIds || !Array.isArray(seatIds) || seatIds.length === 0) {
-          throw new BadRequestError('scheduleId and seatIds (non-empty array) are required');
-     }
-
-     if (!userId) {
-          throw new BadRequestError('userId is required');
-     }
 
      const result = await inventoryService.unlockSeats(scheduleId, seatIds, userId, fromSeq, toSeq, idempotencyKey); // --- SEGMENT BOOKING
 
@@ -72,20 +57,8 @@ exports.unlockSeats = asyncHandler(async (req, res) => {
      });
 });
 
-exports.confirmSeats = asyncHandler(async (req, res) => {
+export const confirmSeats = asyncHandler(async (req, res) => {
      const { scheduleId, seatIds, bookingId, userId, fromSeq, toSeq, idempotencyKey } = req.body; // --- SEGMENT BOOKING: added fromSeq/toSeq
-
-     if (!scheduleId || !seatIds || !Array.isArray(seatIds) || seatIds.length === 0) {
-          throw new BadRequestError('scheduleId, seatIds (non-empty array), and bookingId are required');
-     }
-
-     if (!bookingId) {
-          throw new BadRequestError('bookingId is required');
-     }
-
-     if (!userId) {
-          throw new BadRequestError('userId is required');
-     }
 
      const result = await inventoryService.confirmSeats(scheduleId, seatIds, userId, bookingId, fromSeq, toSeq, idempotencyKey); // --- SEGMENT BOOKING
 
@@ -100,16 +73,8 @@ exports.confirmSeats = asyncHandler(async (req, res) => {
      });
 });
 
-exports.cancelBooking = asyncHandler(async (req, res) => {
+export const cancelBooking = asyncHandler(async (req, res) => {
      const { scheduleId, bookingId, userId, idempotencyKey } = req.body;
-
-     if (!scheduleId || !bookingId) {
-          throw new BadRequestError('scheduleId and bookingId are required');
-     }
-
-     if (!userId) {
-          throw new BadRequestError('userId is required');
-     }
 
      const result = await inventoryService.cancelBooking(scheduleId, bookingId, userId, idempotencyKey);
 

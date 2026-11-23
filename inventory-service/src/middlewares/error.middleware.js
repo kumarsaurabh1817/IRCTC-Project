@@ -1,14 +1,41 @@
-const { AppError } = require('../utils/error');
-const { config } = require('../config');
-const logger = require('../config/logger');
+import { ZodError } from 'zod';
+import { AppError } from '../utils/error.js';
+import { config } from '../config/index.js';
+import logger from '../config/logger.js';
 
-module.exports = (err, req, res, next) => {
+export const errorHandler = (err, req, res, next) => {
+     if (err instanceof ZodError) {
+          const errors = err.issues.map((issue) => ({
+               field: issue.path.join('.'),
+               message: issue.message,
+          }));
+          return res.status(400).json({
+               success: false,
+               error: 'VALIDATION_ERROR',
+               message: errors[0]?.message || 'Validation failed',
+               errors,
+          });
+     }
+
+     // Malformed JSON body (thrown by express.json())
+     if (err.type === 'entity.parse.failed') {
+          return res.status(400).json({
+               success: false,
+               error: 'INVALID_JSON',
+               message: 'Request body contains invalid JSON',
+          });
+     }
+
      if (err instanceof AppError) {
-          return res.status(err.statusCode).json({
+          const response = {
                success: false,
                error: err.code,
-               message: err.message
-          });
+               message: err.message,
+          };
+          if (err.errors) {
+               response.errors = err.errors;
+          }
+          return res.status(err.statusCode).json(response);
      }
 
      console.error("UNHANDLED ERROR:", err);
@@ -29,3 +56,5 @@ module.exports = (err, req, res, next) => {
           message: "Internal Server Error"
      });
 };
+
+export default errorHandler;

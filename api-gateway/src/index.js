@@ -1,17 +1,17 @@
-require('dotenv').config();
-const express = require('express');
-const helmet = require('helmet');
-const cookieParser = require('cookie-parser');
-const morgan = require('morgan');
-const { config } = require('./config');
-const logger = require('./config/logger');
-const errorHandler = require('./middlewares/error.middleware');
-const { notFound } = require('./middlewares/notFound.middleware');
-const { reqLogger } = require('./middlewares/req.middleware');
-const { corsMiddleware } = require('./middlewares/cors.middleware');
-const routes = require('./routes');
-const app = express();
+import 'dotenv/config';
+import express from 'express';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
+import morgan from 'morgan';
+import { config } from './config/index.js';
+import logger from './config/logger.js';
+import errorHandler from './middlewares/error.middleware.js';
+import { notFound } from './middlewares/notFound.middleware.js';
+import { reqLogger } from './middlewares/req.middleware.js';
+import { corsMiddleware } from './middlewares/cors.middleware.js';
+import routes from './routes/index.js';
 
+export const app = express();
 
 app.use(corsMiddleware);
 app.use(helmet({
@@ -73,4 +73,4 @@ process.on('unhandledRejection', (err) => {
      server.close(() => process.exit(1));
 });
 
-module.exports = app;
+export default app;

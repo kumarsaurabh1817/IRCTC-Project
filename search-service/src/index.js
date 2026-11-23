@@ -1,19 +1,19 @@
-require('dotenv').config();
-const path = require('path');
-const express = require('express');
-const cookieParser = require('cookie-parser');
-const helmet = require('helmet');
-const { config } = require('./config');
-const logger = require('./config/logger');
-const { initIndices, recreateIndices } = require('./config/elasticsearch');
+import 'dotenv/config';
+import path from 'path';
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import { config } from './config/index.js';
+import logger from './config/logger.js';
+import { initIndices, recreateIndices } from './config/elasticsearch.js';
 
-const { corsMiddleware } = require('./middlewares/cors.middleware');
-const errorHandler = require('./middlewares/error.middleware');
-const { reqLogger } = require('./middlewares/req.middleware');
+import { corsMiddleware } from './middlewares/cors.middleware.js';
+import errorHandler from './middlewares/error.middleware.js';
+import { reqLogger } from './middlewares/req.middleware.js';
 
-const searchRoutes = require('./routes/search.route');
-const searchConsumer = require('./kafka/consumer/search.consumer');
-const { disconnectAll } = require('./config/kafka');
+import searchRoutes from './routes/search.route.js';
+import searchConsumer from './kafka/consumer/search.consumer.js';
+import { disconnectAll } from './config/kafka.js';
 
 const app = express();
 
@@ -36,7 +36,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Serve frontend static files
-app.use(express.static(path.join(__dirname, '..', 'public')));
+app.use(express.static(path.join(import.meta.dirname, '..', 'public')));
 
 // Mount search routes at root (gateway strips first path segment)
 app.use(searchRoutes);

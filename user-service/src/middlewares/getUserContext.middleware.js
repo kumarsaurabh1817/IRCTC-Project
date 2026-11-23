@@ -1,10 +1,10 @@
-const { UnauthorizedError } = require('../utils/error');
+import { UnauthorizedError } from '../utils/error.js';
 
 /**
  * Extract user context from gateway headers
  * Gateway sets x-user-id after JWT verification(We have discussed this in video)
  */
-function getUserContext(req, res, next) {
+export function getUserContext(req, res, next) {
      const userId = req.headers['x-user-id'];
 
      if (!userId) {
@@ -17,4 +17,4 @@ function getUserContext(req, res, next) {
      next();
 }
 
-module.exports = { getUserContext };
+export default { getUserContext };

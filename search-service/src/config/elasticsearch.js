@@ -1,13 +1,13 @@
-const { Client } = require('@elastic/elasticsearch');
-const { config } = require('.');
-const logger = require('./logger');
+import { Client } from '@elastic/elasticsearch';
+import { config } from './index.js';
+import logger from './logger.js';
 
-const esClient = new Client({ node: config.ELASTICSEARCH_URL });
+export const esClient = new Client({ node: config.ELASTICSEARCH_URL });
 
-const STATION_INDEX = 'stations';
-const TRAIN_INDEX = 'trains';
-const ROUTE_INDEX = 'routes';
-const SCHEDULE_INDEX = 'schedules';
+export const STATION_INDEX = 'stations';
+export const TRAIN_INDEX = 'trains';
+export const ROUTE_INDEX = 'routes';
+export const SCHEDULE_INDEX = 'schedules';
 
 /**
  * Create indices with mappings that power:
@@ -15,7 +15,7 @@ const SCHEDULE_INDEX = 'schedules';
  *   • Autocomplete  (completion suggester)
  *   • Full-text     (text analyzer)
  */
-const initIndices = async () => {
+export const initIndices = async () => {
      // ── Station index (for autocomplete) ──
      const stationExists = await esClient.indices.exists({ index: STATION_INDEX });
      if (!stationExists) {
@@ -108,7 +108,7 @@ const initIndices = async () => {
      }
 };
 
-const recreateIndices = async () => {
+export const recreateIndices = async () => {
      for (const index of [STATION_INDEX, TRAIN_INDEX]) {
           const exists = await esClient.indices.exists({ index });
           if (exists) {
@@ -120,4 +120,4 @@ const recreateIndices = async () => {
      logger.info('All indices recreated');
 };
 
-module.exports = { esClient, STATION_INDEX, TRAIN_INDEX, ROUTE_INDEX, SCHEDULE_INDEX, initIndices, recreateIndices };
+export default esClient;

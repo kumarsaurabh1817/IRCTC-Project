@@ -1,5 +1,5 @@
-const { esClient, TRAIN_INDEX, STATION_INDEX } = require('../config/elasticsearch');
-const logger = require('../config/logger');
+import { esClient, TRAIN_INDEX, STATION_INDEX } from '../config/elasticsearch.js';
+import logger from '../config/logger.js';
 
 // ═══════════════════════════════════════════════════
 //  INDEX OPERATIONS (called by Kafka consumer)
@@ -9,7 +9,7 @@ const logger = require('../config/logger');
  * When admin creates a station, index it for autocomplete.
  * Event shape: { eventType, data: { id, name, code, city, state }, timestamp }
  */
-const indexStation = async (event) => {
+export const indexStation = async (event) => {
      const station = event.data;
      if (!station) return;
 
@@ -38,7 +38,7 @@ const indexStation = async (event) => {
 /**
  * When admin creates a route, we get enriched payload with train+seats+routeStations.
  */
-const indexTrainRoute = async (routeEvent) => {
+export const indexTrainRoute = async (routeEvent) => {
      const { train, routeStations } = routeEvent;
      if (!train || !routeStations) return;
 
@@ -97,7 +97,7 @@ const indexTrainRoute = async (routeEvent) => {
 /**
  * When admin creates a schedule, add it to the train's schedules array.
  */
-const indexSchedule = async (scheduleEvent) => {
+export const indexSchedule = async (scheduleEvent) => {
      const { scheduleId, trainId, departureDate, status, seats } = scheduleEvent;
 
      const totalSeats = seats ? seats.length : 0;
@@ -137,7 +137,7 @@ const indexSchedule = async (scheduleEvent) => {
  * When admin cancels a schedule, update its status in ES.
  * Event shape: { eventType, data: { id, trainId, status: 'CANCELLED', ... }, timestamp }
  */
-const cancelSchedule = async (event) => {
+export const cancelSchedule = async (event) => {
      const schedule = event.data;
      if (!schedule) return;
 
@@ -168,7 +168,7 @@ const cancelSchedule = async (event) => {
 /**
  * When inventory changes (seat booked/released), update availability counts.
  */
-const updateSeatAvailability = async (event) => {
+export const updateSeatAvailability = async (event) => {
      const { scheduleId, trainId, available, locked, booked } = event;
 
      try {
@@ -205,7 +205,7 @@ const updateSeatAvailability = async (event) => {
  * Search trains running between two stations on a given date.
  * Supports fuzzy matching on station names.
  */
-const searchTrains = async (from, to, date) => {
+export const searchTrains = async (from, to, date) => {
      const fromStation = await resolveStation(from);
      const toStation = await resolveStation(to);
 
@@ -334,7 +334,7 @@ const resolveStation = async (input) => {
 /**
  * Autocomplete station names as user types.
  */
-const autocompleteStation = async (prefix) => {
+export const autocompleteStation = async (prefix) => {
      const result = await esClient.search({
           index: STATION_INDEX,
           suggest: {
@@ -360,7 +360,7 @@ const autocompleteStation = async (prefix) => {
 /**
  * Debug: get all indexed stations
  */
-const getAllStations = async () => {
+export const getAllStations = async () => {
      const result = await esClient.search({
           index: STATION_INDEX,
           query: { match_all: {} },
@@ -372,23 +372,11 @@ const getAllStations = async () => {
 /**
  * Debug: get all indexed trains
  */
-const getAllTrains = async () => {
+export const getAllTrains = async () => {
      const result = await esClient.search({
           index: TRAIN_INDEX,
           query: { match_all: {} },
           size: 100,
      });
      return result.hits.hits.map((h) => h._source);
-};
-
-module.exports = {
-     indexStation,
-     indexTrainRoute,
-     indexSchedule,
-     cancelSchedule,
-     updateSeatAvailability,
-     searchTrains,
-     autocompleteStation,
-     getAllStations,
-     getAllTrains,
 };

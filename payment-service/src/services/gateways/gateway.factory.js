@@ -1,5 +1,5 @@
-const { config } = require('../../config');
-const RazorpayGateway = require('./razorpay.gateway');
+import { config } from '../../config/index.js';
+import RazorpayGateway from './razorpay.gateway.js';
 
 let gatewayInstance = null;
 
@@ -11,7 +11,7 @@ let gatewayInstance = null;
  *   2. Add a case here
  *   3. Set PAYMENT_GATEWAY=stripe in .env
  */
-function getGateway() {
+export function getGateway() {
      if (gatewayInstance) return gatewayInstance;
 
      const provider = config.PAYMENT_GATEWAY;
@@ -37,4 +37,4 @@ function getGateway() {
      return gatewayInstance;
 }
 
-module.exports = { getGateway };
+export default { getGateway };

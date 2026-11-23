@@ -1,18 +1,18 @@
-require('dotenv').config();
-const express = require('express');
-const helmet = require('helmet');
-const logger = require('./config/logger');
-const { config } = require('./config');
-const cookieParser = require('cookie-parser');
+import 'dotenv/config';
+import express from 'express';
+import helmet from 'helmet';
+import logger from './config/logger.js';
+import { config } from './config/index.js';
+import cookieParser from 'cookie-parser';
 
-const { corsMiddleware } = require('./middlewares/cors.middleware');
-const errorHandler = require('./middlewares/error.middleware');
-const { reqLogger } = require('./middlewares/req.middleware');
-const { disconnectProducer } = require('./config/kafka');
+import { corsMiddleware } from './middlewares/cors.middleware.js';
+import errorHandler from './middlewares/error.middleware.js';
+import { reqLogger } from './middlewares/req.middleware.js';
+import { disconnectProducer } from './config/kafka.js';
 
-const prisma = require('./config/prisma');
-const paymentRoutes = require('./routes/payment.route');
-const webhookRoutes = require('./routes/webhook.route');
+import prisma from './config/prisma.js';
+import paymentRoutes from './routes/payment.route.js';
+import webhookRoutes from './routes/webhook.route.js';
 
 const app = express();
 
@@ -89,4 +89,4 @@ const startServer = async () => {
 
 startServer();
 
-module.exports = app;
+export default app;

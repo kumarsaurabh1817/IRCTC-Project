@@ -1,6 +1,6 @@
-const axios = require('axios');
-const { config } = require('../config');
-const logger = require('../config/logger');
+import axios from 'axios';
+import { config } from '../config/index.js';
+import logger from '../config/logger.js';
 
 const client = axios.create({
      baseURL: config.PAYMENT_SERVICE_URL,
@@ -36,7 +36,7 @@ async function withRetry(fn, maxRetries = 3) {
      throw lastError;
 }
 
-function extractError(error) {
+export function extractError(error) {
      if (error.response?.data) {
           return {
                status: error.response.status,
@@ -47,7 +47,7 @@ function extractError(error) {
      return { status: 500, message: error.message, code: 'PAYMENT_SERVICE_ERROR' };
 }
 
-const paymentClient = {
+export const paymentClient = {
      async createPaymentOrder(bookingId, amount, userId, idempotencyKey) {
           return withRetry(async () => {
                const { data } = await client.post('/orders', {
@@ -90,4 +90,4 @@ const paymentClient = {
      },
 };
 
-module.exports = { paymentClient, extractError };
+export default paymentClient;

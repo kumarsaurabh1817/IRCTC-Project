@@ -1,17 +1,19 @@
-require('dotenv').config();
-const express = require('express');
-const cookieParser = require('cookie-parser');
-const helmet = require('helmet');
-const { config } = require('./config');
-const logger = require('./config/logger');
+import dotenv from 'dotenv';
+dotenv.config();
 
-const authRoutes = require('./routes/auth.route');
-const userRoutes = require('./routes/user.route');
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import { config } from './config/index.js';
+import logger from './config/logger.js';
 
-const { corsMiddleware } = require('./middlewares/cors.middleware');
-const errorHandler = require('./middlewares/error.middleware');
-const { reqLogger } = require('./middlewares/req.middleware');
-const { disconnectProducer } = require('./config/kafka');
+import authRoutes from './routes/auth.route.js';
+import userRoutes from './routes/user.route.js';
+
+import { corsMiddleware } from './middlewares/cors.middleware.js';
+import errorHandler from './middlewares/error.middleware.js';
+import { reqLogger } from './middlewares/req.middleware.js';
+import { disconnectProducer } from './config/kafka.js';
 
 const app = express();
 
@@ -28,15 +30,15 @@ app.use("/user", userRoutes);
 
 app.get("/", (req, res) => {
      res.send("Hello from index.js of user-service");
-})
+});
 
 app.get("/health", (req, res) => {
      res.status(200).json({
           message: "ok"
-     })
-})
+     });
+});
 
-app.use(errorHandler)
+app.use(errorHandler);
 
 const startServer = async () => {
      try {
@@ -44,7 +46,7 @@ const startServer = async () => {
                logger.info(
                     `${config.SERVICE_NAME} is running on http://localhost:${config.PORT}`
                );
-          })
+          });
           // Graceful shutdown
           const shutdown = async () => {
                logger.info('Shutting down gracefully...');
@@ -62,5 +64,5 @@ const startServer = async () => {
           logger.error("Failed to Start Server", error);
           process.exit(1);
      }
-}
+};
 startServer();

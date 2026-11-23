@@ -1,10 +1,10 @@
-const prisma = require("../config/prisma");
-const { BadRequestError, ConflictError, NotFoundError } = require("../utils/error");
+import prisma from '../config/prisma.js';
+import { BadRequestError, ConflictError, NotFoundError } from '../utils/error.js';
 
-const adminProducer = require('../kafka/producer/admin.producer');
-const logger = require("../config/logger");
+import adminProducer from '../kafka/producer/admin.producer.js';
+import logger from '../config/logger.js';
 
-const createTrain = async (data) => {
+export const createTrain = async (data) => {
      const { trainNumber, trainName, coachName, seats } = data;
      const existing = await prisma.train.findUnique(
           { where: { trainNumber } }
@@ -43,7 +43,7 @@ const createTrain = async (data) => {
      return train;
 }
 
-const createRoute = async (data) => {
+export const createRoute = async (data) => {
      const { trainId, stations } = data;
 
      const train = await prisma.train.findUnique({
@@ -106,7 +106,7 @@ const createRoute = async (data) => {
      return route;
 };
 
-const getAllTrains = async () => {
+export const getAllTrains = async () => {
      return prisma.train.findMany({
           include: {
                seats: { orderBy: { seatNumber: 'asc' } },
@@ -123,7 +123,7 @@ const getAllTrains = async () => {
      });
 };
 
-const getTrainById = async (id) => {
+export const getTrainById = async (id) => {
      const train = await prisma.train.findUnique({
           where: { id },
           include: {
@@ -141,4 +141,5 @@ const getTrainById = async (id) => {
      if (!train) throw new NotFoundError('Train not found');
      return train;
 };
-module.exports = { createTrain, createRoute, getAllTrains, getTrainById };
+
+export default { createTrain, createRoute, getAllTrains, getTrainById };

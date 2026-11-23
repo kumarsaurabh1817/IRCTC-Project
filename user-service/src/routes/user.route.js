@@ -1,14 +1,29 @@
-const express = require('express');
-const {getUserContext} = require('../middlewares/getUserContext.middleware');
-const { internalAuth } = require('../middlewares/internalAuth.middleware');
-const { getProfile, updateProfile, deleteProfile, getUserInternal } = require('../controllers/user.controller');
+import express from 'express';
+import { getUserContext } from '../middlewares/getUserContext.middleware.js';
+import { internalAuth } from '../middlewares/internalAuth.middleware.js';
+import { validate } from '../middlewares/validate.middleware.js';
+import {
+     getUserInternalSchema,
+     updateProfileSchema,
+} from '../validations/user.validation.js';
+import {
+     getProfile,
+     updateProfile,
+     deleteProfile,
+     getUserInternal,
+} from '../controllers/user.controller.js';
 
 const router = express.Router();
 
-router.get("/profile", getUserContext, getProfile);
-router.put("/profile", getUserContext, updateProfile);
-router.delete("/profile", getUserContext, deleteProfile);
+router.get('/profile', getUserContext, getProfile);
+router.put('/profile', getUserContext, validate(updateProfileSchema), updateProfile);
+router.delete('/profile', getUserContext, deleteProfile);
 
-router.get("/internal/:userId", internalAuth, getUserInternal);
+router.get(
+     '/internal/:userId',
+     internalAuth,
+     validate(getUserInternalSchema),
+     getUserInternal
+);
 
-module.exports = router;
+export default router;

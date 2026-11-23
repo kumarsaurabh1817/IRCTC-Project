@@ -1,15 +1,25 @@
-const express = require('express');
-const { createStation, updateStation, deleteStation, getAllStations, getStationById, getStationByIdInternal } = require('../controllers/station.controller');
-
-const {getUserContext} = require('../middlewares/getUserContext.middleware');
-const { internalAuth } = require('../middlewares/internalAuth.middleware');
+import express from 'express';
+import {
+     createStation,
+     getAllStations,
+     getStationById,
+     getStationByIdInternal,
+} from '../controllers/station.controller.js';
+import { getUserContext } from '../middlewares/getUserContext.middleware.js';
+import { internalAuth } from '../middlewares/internalAuth.middleware.js';
+import { validate } from '../middlewares/validate.middleware.js';
+import {
+     createStationSchema,
+     getAllStationsSchema,
+     stationIdParamSchema,
+} from '../validations/station.validation.js';
 
 const router = express.Router();
 
-router.get("/station/internal/:stationId", internalAuth, getStationByIdInternal);
+router.get('/station/internal/:stationId', internalAuth, validate(stationIdParamSchema), getStationByIdInternal);
 
-router.get("/station", getUserContext, getAllStations);
-router.get("/station/:stationId", getUserContext, getStationById);
-router.post("/station", getUserContext, createStation);
+router.get('/station', getUserContext, validate(getAllStationsSchema), getAllStations);
+router.get('/station/:stationId', getUserContext, validate(stationIdParamSchema), getStationById);
+router.post('/station', getUserContext, validate(createStationSchema), createStation);
 
-module.exports = router;
+export default router;

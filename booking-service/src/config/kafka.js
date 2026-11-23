@@ -1,8 +1,8 @@
-const { Kafka, logLevel } = require('kafkajs');
-const logger = require('./logger');
-const { config } = require('.');
+import { Kafka, logLevel } from 'kafkajs';
+import logger from './logger.js';
+import { config } from './index.js';
 
-const kafka = new Kafka({
+export const kafka = new Kafka({
      clientId: config.KAFKA_CLIENT_ID,
      brokers: [config.KAFKA_BROKER || 'localhost:9093'],
      logLevel: logLevel.ERROR,
@@ -14,7 +14,7 @@ const kafka = new Kafka({
 });
 
 // Producer (for publishing BOOKING_CONFIRMED / BOOKING_CANCELLED / BOOKING_FAILED)
-const producer = kafka.producer({
+export const producer = kafka.producer({
      allowAutoTopicCreation: true,
      transactionTimeout: 30000,
      idempotent: true,
@@ -26,7 +26,7 @@ const producer = kafka.producer({
 
 let isProducerConnected = false;
 
-const connectProducer = async () => {
+export const connectProducer = async () => {
      if (!isProducerConnected) {
           await producer.connect();
           isProducerConnected = true;
@@ -34,7 +34,7 @@ const connectProducer = async () => {
      }
 };
 
-const disconnectProducer = async () => {
+export const disconnectProducer = async () => {
      if (isProducerConnected) {
           await producer.disconnect();
           isProducerConnected = false;
@@ -43,20 +43,20 @@ const disconnectProducer = async () => {
 };
 
 // Consumer (for PAYMENT_SUCCESS, PAYMENT_FAILED)
-const consumer = kafka.consumer({
+export const consumer = kafka.consumer({
      groupId: 'booking-service-group',
      sessionTimeout: 30000,
      heartbeatInterval: 3000,
 });
 
-const disconnectConsumer = async () => {
+export const disconnectConsumer = async () => {
      await consumer.disconnect();
      logger.info('Kafka consumer disconnected');
 };
 
-const disconnectAll = async () => {
+export const disconnectAll = async () => {
      await disconnectProducer();
      await disconnectConsumer();
 };
 
-module.exports = { kafka, producer, consumer, connectProducer, disconnectProducer, disconnectConsumer, disconnectAll };
+export default { kafka, producer, consumer, connectProducer, disconnectProducer, disconnectConsumer, disconnectAll };

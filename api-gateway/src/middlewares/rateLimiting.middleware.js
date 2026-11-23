@@ -1,7 +1,7 @@
-const { redis } = require('../config/redis');
-const { config } = require('../config');
-const { TooManyRequestsError } = require('../utils/error');
-const logger = require('../config/logger');
+import { redis } from '../config/redis.js';
+import { config } from '../config/index.js';
+import { TooManyRequestsError } from '../utils/error.js';
+import logger from '../config/logger.js';
 
 /**
  * Rate limiting strategies:
@@ -67,7 +67,7 @@ async function rateLimiter(key, maxRequests, windowMs) {
  * IP-based rate limiting middleware
  * Default: 100 requests per 15 minutes
  */
-function ipRateLimit(options = {}) {
+export function ipRateLimit(options = {}) {
      const maxRequests = options.max || config.RATE_LIMIT_MAX_REQUESTS;
      const windowMs = options.windowMs || config.RATE_LIMIT_WINDOW_MS;
 
@@ -102,7 +102,7 @@ function ipRateLimit(options = {}) {
  * Should be used after authentication middleware
  * Default: 1000 requests per 15 minutes (more lenient than IP-based)
 **/
-function userRateLimit(options = {}) {
+export function userRateLimit(options = {}) {
      const maxRequests = options.max || config.RATE_LIMIT_MAX_REQUESTS * 10;
      const windowMs = options.windowMs || config.RATE_LIMIT_WINDOW_MS;
 
@@ -140,7 +140,7 @@ function userRateLimit(options = {}) {
  * Endpoint-specific rate limiting
  * Example: POST /api/auth/send-otp - 5 requests per hour
 **/
-function endpointRateLimit(maxRequests, windowMs) {
+export function endpointRateLimit(maxRequests, windowMs) {
      return async (req, res, next) => {
           const ip = req.ip || req.connection.remoteAddress;
           const endpoint = `${req.method}:${req.path}`;
@@ -171,7 +171,7 @@ function endpointRateLimit(maxRequests, windowMs) {
  * Combined rate limiting strategy
  * Applies both IP and user-based rate limiting
 **/
-function combinedRateLimit(ipOptions = {}, userOptions = {}) {
+export function combinedRateLimit(ipOptions = {}, userOptions = {}) {
      const ipLimiter = ipRateLimit(ipOptions);
      const userLimiter = userRateLimit(userOptions);
 
@@ -186,7 +186,7 @@ function combinedRateLimit(ipOptions = {}, userOptions = {}) {
      };
 }
 
-module.exports = {
+export default {
      ipRateLimit,
      userRateLimit,
      endpointRateLimit,

@@ -1,8 +1,8 @@
-const { Kafka, logLevel } = require('kafkajs');
-const logger = require('./logger');
-const { config } = require('.');
+import { Kafka, logLevel } from 'kafkajs';
+import logger from './logger.js';
+import { config } from './index.js';
 
-const kafka = new Kafka({
+export const kafka = new Kafka({
      clientId: config.KAFKA_CLIENT_ID,
      brokers: [config.KAFKA_BROKER || 'localhost:9093'],
      logLevel: logLevel.ERROR,
@@ -14,7 +14,7 @@ const kafka = new Kafka({
 });
 
 // Producer only (payment-service publishes PAYMENT_SUCCESS / PAYMENT_FAILED)
-const producer = kafka.producer({
+export const producer = kafka.producer({
      allowAutoTopicCreation: true,
      transactionTimeout: 30000,
      idempotent: true,
@@ -26,7 +26,7 @@ const producer = kafka.producer({
 
 let isProducerConnected = false;
 
-const connectProducer = async () => {
+export const connectProducer = async () => {
      if (!isProducerConnected) {
           await producer.connect();
           isProducerConnected = true;
@@ -34,7 +34,7 @@ const connectProducer = async () => {
      }
 };
 
-const disconnectProducer = async () => {
+export const disconnectProducer = async () => {
      if (isProducerConnected) {
           await producer.disconnect();
           isProducerConnected = false;
@@ -42,4 +42,4 @@ const disconnectProducer = async () => {
      }
 };
 
-module.exports = { kafka, producer, connectProducer, disconnectProducer };
+export default { kafka, producer, connectProducer, disconnectProducer };

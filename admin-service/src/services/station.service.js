@@ -1,9 +1,9 @@
-const prisma = require("../config/prisma");
-const { ConflictError, NotFoundError } = require("../utils/error");
-const logger = require('../config/logger');
-const adminProducer = require('../kafka/producer/admin.producer');
+import prisma from '../config/prisma.js';
+import { ConflictError, NotFoundError } from '../utils/error.js';
+import logger from '../config/logger.js';
+import adminProducer from '../kafka/producer/admin.producer.js';
 
-const createStation = async (data) => {
+export const createStation = async (data) => {
      const existing = await prisma.station.findUnique({
           where: { code: data.code }
      });
@@ -25,7 +25,7 @@ const createStation = async (data) => {
      return station;
 }
 
-const getAllStations = async (page, limit, search) => {
+export const getAllStations = async (page, limit, search) => {
      const skip = (page - 1) * limit;
 
      const where = search ? {
@@ -51,7 +51,7 @@ const getAllStations = async (page, limit, search) => {
      return { stations, total };
 };
 
-const getStationById = async (stationId) => {
+export const getStationById = async (stationId) => {
      const station = await prisma.station.findUnique({
           where: { id: stationId }
      });
@@ -64,4 +64,4 @@ const getStationById = async (stationId) => {
 };
 
 
-module.exports = { createStation, getAllStations, getStationById };
+export default { createStation, getAllStations, getStationById };

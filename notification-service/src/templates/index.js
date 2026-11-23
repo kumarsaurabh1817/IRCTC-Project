@@ -1,5 +1,6 @@
-const {config} = require('../config');
-function getOtpTemplate(otp, ttlMinutes) {
+import { config } from '../config/index.js';
+
+export function getOtpTemplate(otp, ttlMinutes) {
   return `
     <div style="
       font-family: Arial, sans-serif; 
@@ -58,7 +59,7 @@ function getOtpTemplate(otp, ttlMinutes) {
   `;
 }
 
-function getWelcomeTemplate(firstName) {
+export function getWelcomeTemplate(firstName) {
   return `
     <div style="
       font-family: Arial, sans-serif; 
@@ -113,7 +114,7 @@ function getWelcomeTemplate(firstName) {
   `;
 }
 
-function getTicketConfirmationTemplate(ticketData) {
+export function getTicketConfirmationTemplate(ticketData) {
   const { pnr, trainName, trainNumber, from, to, date, passengers, amount } = ticketData;
 
   return `
@@ -178,7 +179,7 @@ const CANCELLATION_REASON_MESSAGES = {
   schedule_cancelled: 'The train schedule for this booking was cancelled by IRCTC.',
 };
 
-function getBookingConfirmedTemplate(data) {
+export function getBookingConfirmedTemplate(data) {
   const {
     bookingId,
     firstName,
@@ -253,7 +254,7 @@ function getBookingConfirmedTemplate(data) {
   `;
 }
 
-function getBookingFailedTemplate(data) {
+export function getBookingFailedTemplate(data) {
   const { bookingId, firstName, reason } = data;
   const friendlyReason = FAILURE_REASON_MESSAGES[reason] || 'Your booking could not be completed.';
 
@@ -299,7 +300,7 @@ function getBookingFailedTemplate(data) {
   `;
 }
 
-function getBookingCancelledTemplate(data) {
+export function getBookingCancelledTemplate(data) {
   const { bookingId, firstName, reason, refundAmount } = data;
   const friendlyReason = CANCELLATION_REASON_MESSAGES[reason] || 'Your booking has been cancelled.';
   const refundLine = refundAmount && refundAmount > 0
@@ -347,12 +348,3 @@ function getBookingCancelledTemplate(data) {
     </div>
   `;
 }
-
-module.exports = {
-  getOtpTemplate,
-  getWelcomeTemplate,
-  getTicketConfirmationTemplate,
-  getBookingConfirmedTemplate,
-  getBookingFailedTemplate,
-  getBookingCancelledTemplate,
-};

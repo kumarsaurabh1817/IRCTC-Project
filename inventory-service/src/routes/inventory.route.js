@@ -1,17 +1,26 @@
-const express = require('express');
-const { getUserContext } = require('../middlewares/getUserContext.middleware');
-const { internalAuth } = require('../middlewares/internalAuth.middleware');
-const { config } = require('../config');
-const {
+import express from 'express';
+import { getUserContext } from '../middlewares/getUserContext.middleware.js';
+import { internalAuth } from '../middlewares/internalAuth.middleware.js';
+import { validate } from '../middlewares/validate.middleware.js';
+import { config } from '../config/index.js';
+import {
+     scheduleIdParamSchema,
+     getScheduleSeatsSchema,
+     lockSeatsSchema,
+     unlockSeatsSchema,
+     confirmSeatsSchema,
+     cancelBookingSchema,
+} from '../validations/inventory.validation.js';
+import {
      getScheduleAvailability,
      getScheduleSeats,
      lockSeats,
      unlockSeats,
      confirmSeats,
      cancelBooking,
-} = require('../controllers/inventory.controller');
+} from '../controllers/inventory.controller.js';
 
-const router = express.Router();
+export const router = express.Router();
 
 // Allows either user context (from gateway) or internal service key (from booking-service)
 function userOrInternal(req, res, next) {
@@ -24,15 +33,15 @@ function userOrInternal(req, res, next) {
 }
 
 // Public: aggregate availability (used by search results)
-router.get('/schedules/:scheduleId/availability', getScheduleAvailability);
+router.get('/schedules/:scheduleId/availability', validate(scheduleIdParamSchema), getScheduleAvailability);
 
 // Authenticated OR internal: individual seat statuses
-router.get('/schedules/:scheduleId/seats', userOrInternal, getScheduleSeats);
+router.get('/schedules/:scheduleId/seats', userOrInternal, validate(getScheduleSeatsSchema), getScheduleSeats);
 
 // Internal: called by booking-service (protected by service key)
-router.post('/seats/lock', internalAuth, lockSeats);
-router.post('/seats/unlock', internalAuth, unlockSeats);
-router.post('/seats/confirm', internalAuth, confirmSeats);
-router.post('/seats/cancel-booking', internalAuth, cancelBooking);
+router.post('/seats/lock', internalAuth, validate(lockSeatsSchema), lockSeats);
+router.post('/seats/unlock', internalAuth, validate(unlockSeatsSchema), unlockSeats);
+router.post('/seats/confirm', internalAuth, validate(confirmSeatsSchema), confirmSeats);
+router.post('/seats/cancel-booking', internalAuth, validate(cancelBookingSchema), cancelBooking);
 
-module.exports = router;
+export default router;

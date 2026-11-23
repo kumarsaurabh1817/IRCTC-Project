@@ -1,8 +1,8 @@
-const { producer, connectProducer } = require('../../config/kafka');
-const logger = require('../../config/logger');
-const { KAFKA_TOPICS } = require('../../../../shared/constants/kafka-topics');
+import { producer, connectProducer } from '../../config/kafka.js';
+import logger from '../../config/logger.js';
+import { KAFKA_TOPICS } from '../../../../shared/constants/kafka-topics.js';
 
-class NotificationProducer {
+export class NotificationProducer {
      constructor() {
           this.isInitialized = false;
      }
@@ -13,7 +13,6 @@ class NotificationProducer {
                this.isInitialized = true;
           }
      }
-
 
      async sendMessage(topic, key, value){
           try{
@@ -26,7 +25,7 @@ class NotificationProducer {
                          value: JSON.stringify(value),
                          timeStamp: Date.now().toString()
                     }]
-               }
+               };
 
                const result = await producer.send(message);
                logger.info(`Message sent to kafka topic: ${topic}`, {
@@ -41,16 +40,17 @@ class NotificationProducer {
                     error: error.message,
                     stack: error.stack,
                     key
-               })
+               });
                throw error;
           }
      }
+
      async sendOtpEmail(email, otp, ttlMinutes = 5){
           return this.sendMessage(
                KAFKA_TOPICS.OTP_EMAIL,
                `otp-${email}`,
                {email, otp, ttlMinutes}
-          )
+          );
      }
 
      async sendWelcomeEmail(email, firstName){
@@ -58,8 +58,11 @@ class NotificationProducer {
                KAFKA_TOPICS.WELCOME_EMAIL,
                `welcome-${email}`,
                {email, firstName}
-          )
+          );
      }
 }
 
-module.exports = new NotificationProducer();
+const notificationProducer = new NotificationProducer();
+
+export default notificationProducer;
+export { notificationProducer };

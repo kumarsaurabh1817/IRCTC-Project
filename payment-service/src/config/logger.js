@@ -1,7 +1,7 @@
-const winston = require('winston');
-const {config} = require('.');
+import winston from 'winston';
+import { config } from './index.js';
 
-const logger = winston.createLogger({
+export const logger = winston.createLogger({
      level: config.LOG_LEVEL,
      defaultMeta: {service: config.SERVICE_NAME},
      format: winston.format.combine(
@@ -14,4 +14,4 @@ const logger = winston.createLogger({
      transports: [new winston.transports.Console()]
 })
 
-module.exports = logger;
+export default logger;

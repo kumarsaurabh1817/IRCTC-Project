@@ -1,6 +1,6 @@
-const axios = require('axios');
-const { config } = require('../config');
-const logger = require('../config/logger');
+import axios from 'axios';
+import { config } from '../config/index.js';
+import logger from '../config/logger.js';
 
 const client = axios.create({
      baseURL: config.USER_SERVICE_URL,
@@ -33,7 +33,7 @@ async function withRetry(fn, maxRetries = 3) {
      throw lastError;
 }
 
-const userClient = {
+export const userClient = {
      async getUserById(userId) {
           return withRetry(async () => {
                const { data } = await client.get(`/user/internal/${userId}`);
@@ -42,4 +42,4 @@ const userClient = {
      },
 };
 
-module.exports = { userClient };
+export default userClient;

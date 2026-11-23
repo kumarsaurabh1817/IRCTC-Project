@@ -1,6 +1,9 @@
-const config = {
+import 'dotenv/config';
+import packageJson from '../../package.json' with { type: 'json' };
+
+export const config = {
      PORT: process.env.PORT || 4000,
-     SERVICE_NAME: require('../../package.json').name,
+     SERVICE_NAME: packageJson.name,
      NODE_ENV: process.env.NODE_ENV || 'development',
 
      REDIS_URL: process.env.REDIS_URL,
@@ -40,4 +43,4 @@ requiredConfig.forEach((key) => {
      }
 });
 
-module.exports = { config };
+export default config

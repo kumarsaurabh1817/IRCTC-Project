@@ -1,6 +1,6 @@
-const axios = require('axios');
-const { config } = require('../config');
-const logger = require('../config/logger');
+import axios from 'axios';
+import { config } from '../config/index.js';
+import logger from '../config/logger.js';
 
 const client = axios.create({
      baseURL: config.ADMIN_SERVICE_URL,
@@ -53,7 +53,7 @@ async function withRetry(fn, maxRetries = 3) {
      throw lastError;
 }
 
-const stationClient = {
+export const stationClient = {
      async getStationById(stationId) {
           if (!stationId) return null;
 
@@ -75,4 +75,4 @@ const stationClient = {
      },
 };
 
-module.exports = { stationClient };
+export default stationClient;

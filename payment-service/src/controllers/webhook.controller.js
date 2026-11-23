@@ -1,13 +1,13 @@
-const asyncHandler = require('../utils/asyncHandler');
-const paymentService = require('../services/payment.service');
-const logger = require('../config/logger');
+import asyncHandler from '../utils/asyncHandler.js';
+import * as paymentService from '../services/payment.service.js';
+import logger from '../config/logger.js';
 
 /**
  * Razorpay webhook handler.
  * IMPORTANT: This endpoint receives raw body (not JSON-parsed)
  * for signature verification. The route must use express.raw().
  */
-exports.razorpayWebhook = asyncHandler(async (req, res) => {
+export const razorpayWebhook = asyncHandler(async (req, res) => {
      const signature = req.headers['x-razorpay-signature'];
 
      if (!signature) {

@@ -1,9 +1,9 @@
-const prisma = require('../config/prisma');
-const logger = require('../config/logger');
-const paymentProducer = require('../kafka/producer/payment.producer');
-const { getGateway } = require('./gateways/gateway.factory');
-const { BadRequestError, NotFoundError, ConflictError } = require('../utils/error');
-const { config } = require('../config');
+import prisma from '../config/prisma.js';
+import logger from '../config/logger.js';
+import paymentProducer from '../kafka/producer/payment.producer.js';
+import { getGateway } from './gateways/gateway.factory.js';
+import { BadRequestError, NotFoundError, ConflictError } from '../utils/error.js';
+import { config } from '../config/index.js';
 
 // ─── Optimistic Lock Helper (CAS — Compare-And-Swap) ─────────────────────────
 // The webhook and the browser's verify call routinely arrive within milliseconds
@@ -48,7 +48,7 @@ const withIdempotency = async (key, fn) => {
 
 // ─── Create Payment Order ────────────────────────────────────────────────────
 
-const createPaymentOrder = async (bookingId, amount, userId, idempotencyKey) => {
+export const createPaymentOrder = async (bookingId, amount, userId, idempotencyKey) => {
      if (!bookingId || !amount || !userId || !idempotencyKey) {
           throw new BadRequestError('bookingId, amount, userId, and idempotencyKey are required');
      }
@@ -109,7 +109,7 @@ const createPaymentOrder = async (bookingId, amount, userId, idempotencyKey) => 
 
 // ─── Handle Webhook ──────────────────────────────────────────────────────────
 
-const handleWebhook = async (rawBody, signature) => {
+export const handleWebhook = async (rawBody, signature) => {
      const gateway = getGateway();
 
      // Verify signature
@@ -297,7 +297,7 @@ const handleRefundProcessed = async (paymentOrder, refundEntity) => {
 
 // ─── Verify and Capture (client-side verification) ───────────────────────────
 
-const verifyAndCapturePayment = async (paymentOrderId, gatewayPaymentId, gatewaySignature) => {
+export const verifyAndCapturePayment = async (paymentOrderId, gatewayPaymentId, gatewaySignature) => {
      if (!paymentOrderId || !gatewayPaymentId || !gatewaySignature) {
           throw new BadRequestError('paymentOrderId, gatewayPaymentId, and gatewaySignature are required');
      }
@@ -413,7 +413,7 @@ const verifyAndCapturePayment = async (paymentOrderId, gatewayPaymentId, gateway
 
 // ─── Initiate Refund ─────────────────────────────────────────────────────────
 
-const initiateRefund = async (paymentOrderId, amount, reason, idempotencyKey) => {
+export const initiateRefund = async (paymentOrderId, amount, reason, idempotencyKey) => {
      if (!paymentOrderId || !amount || !idempotencyKey) {
           throw new BadRequestError('paymentOrderId, amount, and idempotencyKey are required');
      }
@@ -509,7 +509,7 @@ const initiateRefund = async (paymentOrderId, amount, reason, idempotencyKey) =>
 
 // ─── Get Payment Order ───────────────────────────────────────────────────────
 
-const getPaymentOrder = async (paymentOrderId) => {
+export const getPaymentOrder = async (paymentOrderId) => {
      const paymentOrder = await prisma.paymentOrder.findUnique({
           where: { id: paymentOrderId },
           include: {
@@ -523,12 +523,4 @@ const getPaymentOrder = async (paymentOrderId) => {
      }
 
      return paymentOrder;
-};
-
-module.exports = {
-     createPaymentOrder,
-     handleWebhook,
-     verifyAndCapturePayment,
-     initiateRefund,
-     getPaymentOrder,
 };

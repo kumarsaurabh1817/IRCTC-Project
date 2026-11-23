@@ -1,5 +1,5 @@
-const express = require('express');
-const { razorpayWebhook } = require('../controllers/webhook.controller');
+import express from 'express';
+import { razorpayWebhook } from '../controllers/webhook.controller.js';
 
 const router = express.Router();
 
@@ -7,4 +7,4 @@ const router = express.Router();
 // IMPORTANT: Uses express.raw() so we get the raw body for signature verification
 router.post('/webhooks/razorpay', express.raw({ type: 'application/json' }), razorpayWebhook);
 
-module.exports = router;
+export default router;

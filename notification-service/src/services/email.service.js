@@ -1,18 +1,18 @@
-const sgMail = require('@sendgrid/mail');
-const logger = require('../config/logger');
-const { config } = require('../config');
-const {
+import sgMail from '@sendgrid/mail';
+import logger from '../config/logger.js';
+import { config } from '../config/index.js';
+import {
      getOtpTemplate,
      getWelcomeTemplate,
      getTicketConfirmationTemplate,
      getBookingConfirmedTemplate,
      getBookingFailedTemplate,
      getBookingCancelledTemplate,
-} = require('../templates');
+} from '../templates/index.js';
 
 sgMail.setApiKey(config.SENDGRID_API_KEY);
 
-class EmailService {
+export class EmailService {
      constructor() {
           this.from = config.MAIL_SEND
           this.maxRetries = 3;
@@ -99,4 +99,7 @@ class EmailService {
      }
 }
 
-module.exports = new EmailService();
+const emailService = new EmailService();
+
+export default emailService;
+export { emailService };

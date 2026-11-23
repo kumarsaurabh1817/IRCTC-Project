@@ -1,7 +1,8 @@
-const { Kafka, logLevel } = require('kafkajs');
-const logger = require('./logger');
-const { config } = require('.');
-const kafka = new Kafka({
+import { Kafka, logLevel } from 'kafkajs';
+import logger from './logger.js';
+import { config } from './index.js';
+
+export const kafka = new Kafka({
      clientId: config.KAFKA_CLIENT_ID,
      brokers: [config.KAFKA_BROKER || 'localhost:9093'],
      logLevel: logLevel.ERROR,
@@ -13,21 +14,21 @@ const kafka = new Kafka({
      },
 });
 
-const consumer = kafka.consumer({
+export const consumer = kafka.consumer({
      groupId: 'notification-service-group',
      sessionTimeout: 30000,
      heartbeatInterval: 3000,
 });
 
 // Producer (used only for DLQ publishing)
-const producer = kafka.producer({
+export const producer = kafka.producer({
      allowAutoTopicCreation: true,
      retry: { retries: 3 },
 });
 
 let isProducerConnected = false;
 
-const connectProducer = async () => {
+export const connectProducer = async () => {
      if (!isProducerConnected) {
           await producer.connect();
           isProducerConnected = true;
@@ -49,4 +50,3 @@ const shutdown = async () => {
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
 
-module.exports = { kafka, consumer, producer, connectProducer };

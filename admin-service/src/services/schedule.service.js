@@ -1,9 +1,9 @@
-const { BadRequestError, ConflictError, NotFoundError } = require('../utils/error');
-const adminProducer = require('../kafka/producer/admin.producer');
-const logger = require('../config/logger');
-const prisma = require('../config/prisma');
+import { BadRequestError, ConflictError, NotFoundError } from '../utils/error.js';
+import adminProducer from '../kafka/producer/admin.producer.js';
+import logger from '../config/logger.js';
+import prisma from '../config/prisma.js';
 
-const createSchedule = async (data) => {
+export const createSchedule = async (data) => {
      const { trainId, departureDate } = data;
      const train = await prisma.train.findUnique({
           where: { id: trainId },
@@ -75,7 +75,7 @@ const createSchedule = async (data) => {
 }
 
 
-const getAllSchedules = async (query = {}) => {
+export const getAllSchedules = async (query = {}) => {
      const where = {};
      if (query.trainId) where.trainId = query.trainId;
      if (query.status) where.status = query.status;
@@ -102,7 +102,7 @@ const getAllSchedules = async (query = {}) => {
 };
 
 
-const cancelSchedule = async (scheduleId) => {
+export const cancelSchedule = async (scheduleId) => {
      const schedule = await prisma.schedule.findUnique({ where: { id: scheduleId } });
      if (!schedule) throw new NotFoundError('Schedule not found');
 
@@ -115,4 +115,4 @@ const cancelSchedule = async (scheduleId) => {
      return updated;
 };
 
-module.exports = { createSchedule, getAllSchedules, cancelSchedule };
+export default { createSchedule, getAllSchedules, cancelSchedule };

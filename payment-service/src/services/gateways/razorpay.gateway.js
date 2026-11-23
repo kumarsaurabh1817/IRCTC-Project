@@ -1,9 +1,10 @@
-const Razorpay = require('razorpay');
-const crypto = require('crypto');
-const BaseGateway = require('./base.gateway');
-const logger = require('../../config/logger');
+import Razorpay from 'razorpay';
+import crypto from 'crypto';
+import BaseGateway from './base.gateway.js';
+import logger from '../../config/logger.js';
+import { BadRequestError } from '../../utils/error.js';
 
-class RazorpayGateway extends BaseGateway {
+export class RazorpayGateway extends BaseGateway {
      constructor(keyId, keySecret, webhookSecret) {
           super('razorpay');
           this.keyId = keyId;
@@ -30,7 +31,7 @@ class RazorpayGateway extends BaseGateway {
                // Razorpay SDK throws plain objects, not Error instances
                const description = err?.error?.description || err?.message || JSON.stringify(err);
                logger.error(`Razorpay createOrder failed: ${description}`);
-               const { BadRequestError } = require('../../utils/error');
+
                throw new BadRequestError(`Payment gateway error: ${description}`, 'PAYMENT_GATEWAY_ERROR');
           }
 
@@ -122,4 +123,4 @@ class RazorpayGateway extends BaseGateway {
      }
 }
 
-module.exports = RazorpayGateway;
+export default RazorpayGateway;

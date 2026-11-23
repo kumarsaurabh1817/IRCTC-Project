@@ -1,5 +1,5 @@
-const prisma = require('../config/prisma');
-const logger = require('../config/logger');
+import prisma from '../config/prisma.js';
+import logger from '../config/logger.js';
 
 /**
  * Idempotency wrapper for mutating inventory operations.
@@ -28,7 +28,7 @@ const isUniqueViolation = (error) =>
      error?.code === '23505' ||
      (typeof error?.message === 'string' && error.message.includes('idempotency_records_eventKey_key'));
 
-const withIdempotency = async (eventKey, operation) => {
+export const withIdempotency = async (eventKey, operation) => {
      // No key supplied — caller opted out (or is an older client). Behave as before.
      if (!eventKey) return operation(null);
 
@@ -58,9 +58,9 @@ const withIdempotency = async (eventKey, operation) => {
  * Persist the idempotency record inside the operation's own transaction.
  * No-op when the caller supplied no key.
  */
-const recordIdempotency = async (tx, eventKey, response) => {
+export const recordIdempotency = async (tx, eventKey, response) => {
      if (!eventKey) return;
      await tx.idempotencyRecord.create({ data: { eventKey, response } });
 };
 
-module.exports = { withIdempotency, recordIdempotency };
+export default { withIdempotency, recordIdempotency };

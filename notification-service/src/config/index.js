@@ -1,5 +1,8 @@
-const config = {
-     SERVICE_NAME: require('../../package.json').name,
+import 'dotenv/config';
+import packageJson from '../../package.json' with { type: 'json' };
+
+export const config = {
+     SERVICE_NAME: packageJson.name,
      PORT: Number(process.env.PORT) || 4004,
      NODE_ENV: process.env.NODE_ENV || "development",
      LOG_LEVEL: process.env.LOG_LEVEL || "info",
@@ -10,4 +13,5 @@ const config = {
      MAIL_SEND: process.env.MAIL_SEND,
      FRONTEND_URL: process.env.FRONTEND_URL
 }
-module.exports = { config };
+
+export default config;

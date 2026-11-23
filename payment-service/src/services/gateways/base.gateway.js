@@ -3,7 +3,7 @@
  * All gateway implementations must extend this and implement every method.
  * This enables the adapter pattern — swap gateways without touching business logic.
  */
-class BaseGateway {
+export class BaseGateway {
      constructor(providerName) {
           if (new.target === BaseGateway) {
                throw new Error('BaseGateway is abstract and cannot be instantiated directly');
@@ -75,4 +75,4 @@ class BaseGateway {
      }
 }
 
-module.exports = BaseGateway;
+export default BaseGateway;
