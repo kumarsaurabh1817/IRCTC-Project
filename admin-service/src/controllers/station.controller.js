@@ -6,7 +6,7 @@ import stationService from '../services/station.service.js';
 export const createStation = asyncHandler(async (req, res) => {
      const { name, code, city, state } = req.body;
 
-     const station = await stationService.createStation({ code, name, city, state });
+     const station = await stationService.createStation({ code: code.toUpperCase(), name, city, state });
 
      res.status(201).json({
           success: true,

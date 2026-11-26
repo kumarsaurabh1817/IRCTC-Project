@@ -34,7 +34,7 @@ export const sendOTPSchema = z.object({
                     .min(1, 'Confirm password is required'),
           })
           .refine((data) => data.password === data.confirmPassword, {
-               message: 'Password mismatch',
+               message: 'Passwords do not match',
                path: ['confirmPassword'],
           }),
 });
